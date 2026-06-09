@@ -21,6 +21,8 @@ import type {
   ScraperRunPayload,
   ScraperRunResult,
 } from "./types";
+import { runMatching } from "../matcher/run";
+import type { MatchingResult } from "../matcher/types";
 import {
   ScraperBusyError,
   ScraperNotWaitingError,
@@ -41,8 +43,23 @@ export type BrowserFactory = () => Promise<BrowserSession>;
 
 let browserFactory: BrowserFactory = launchBrowser;
 
+type MatchingRunner = (
+  runId: number,
+  emit: ProgressEmitter
+) => Promise<MatchingResult>;
+
+let matchingRunner: MatchingRunner = runMatching;
+
 export function setBrowserFactory(factory: BrowserFactory): void {
   browserFactory = factory;
+}
+
+export function setMatchingRunner(runner: MatchingRunner): void {
+  matchingRunner = runner;
+}
+
+export function resetMatchingRunner(): void {
+  matchingRunner = runMatching;
 }
 
 export function resetRunState(): void {
@@ -221,19 +238,21 @@ export async function runScraper(
     const keywords = loadActiveKeywords();
 
     if (boards.length === 0 || keywords.length === 0) {
-      finishRun(runId, { totalScraped: 0, totalNew: 0 });
+      finishRun(runId, { totalScraped: 0, totalNew: 0, totalMatched: 0 });
       emit({
         type: "run_complete",
         timestamp: new Date().toISOString(),
         runId,
         totalScraped: 0,
         totalNew: 0,
+        totalMatched: 0,
       });
       runState = "idle";
       return {
         runId,
         totalScraped: 0,
         totalNew: 0,
+        totalMatched: 0,
         boardErrors: [],
       };
     }
@@ -292,19 +311,27 @@ export async function runScraper(
       });
     }
 
-    finishRun(runId, { totalScraped, totalNew });
+    const matching = await matchingRunner(runId, emit);
+
+    finishRun(runId, {
+      totalScraped,
+      totalNew,
+      totalMatched: matching.totalMatched,
+    });
     emit({
       type: "run_complete",
       timestamp: new Date().toISOString(),
       runId,
       totalScraped,
       totalNew,
+      totalMatched: matching.totalMatched,
     });
 
     return {
       runId,
       totalScraped,
       totalNew,
+      totalMatched: matching.totalMatched,
       boardErrors,
     };
   } catch (err) {
@@ -316,7 +343,7 @@ export async function runScraper(
     });
 
     if (runId !== null) {
-      finishRun(runId, { totalScraped, totalNew });
+      finishRun(runId, { totalScraped, totalNew, totalMatched: 0 });
     }
 
     return { error: message };

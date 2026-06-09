@@ -14,14 +14,20 @@ export function createRun(): number {
 
 export function finishRun(
   runId: number,
-  totals: { totalScraped: number; totalNew: number }
+  totals: { totalScraped: number; totalNew: number; totalMatched: number }
 ): void {
   const finishedAt = new Date().toISOString();
   db.prepare(
     `UPDATE runs
-     SET finished_at = ?, total_scraped = ?, total_new = ?
+     SET finished_at = ?, total_scraped = ?, total_new = ?, total_matched = ?
      WHERE id = ?`
-  ).run(finishedAt, totals.totalScraped, totals.totalNew, runId);
+  ).run(
+    finishedAt,
+    totals.totalScraped,
+    totals.totalNew,
+    totals.totalMatched,
+    runId
+  );
 }
 
 export function loadBoards(): BoardRow[] {

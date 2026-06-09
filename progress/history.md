@@ -59,3 +59,19 @@
 - **Changes:** resume.ts main module; resume:upload IPC with pdf-parse + mammoth; ResumeScreen upload UI; DB upsert for resume table.
 - **Tests:** resume.test.ts, ResumeScreen tests, IPC tests.
 - **Result:** All 14 tasks [x]. Reviewer approved.
+
+---
+
+## 2026-06-08 — scraping-engine (done)
+- **Agent:** spec_author → implementer → reviewer (2 rounds)
+- **Changes:** Playwright scraper pipeline; scraper:run/provideSelector IPC; scraper:progress events; heuristic search bar + pagination + dedup.
+- **Tests:** scraper unit/integration tests (91 main-process tests).
+- **Result:** All 24 tasks [x]. Reviewer approved.
+
+---
+
+## 2026-06-08 — ai-matching (done)
+- **Agent:** spec_author → implementer → reviewer (2 rounds)
+- **Changes:** Three-phase AI pipeline (skill profile, batch scoring, match reasons); Ollama + Anthropic backends; integrated into scraper run.
+- **Tests:** matcher unit tests with mocked fetch (126 total).
+- **Result:** All 28 tasks [x]. Reviewer approved.

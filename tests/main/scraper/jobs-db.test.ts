@@ -29,21 +29,23 @@ describe("jobs-db", () => {
 
   it("finishRun sets finished_at and totals", () => {
     const runId = createRun();
-    finishRun(runId, { totalScraped: 5, totalNew: 2 });
+    finishRun(runId, { totalScraped: 5, totalNew: 2, totalMatched: 3 });
 
     const run = db
       .prepare(
-        "SELECT finished_at, total_scraped, total_new FROM runs WHERE id = ?"
+        "SELECT finished_at, total_scraped, total_new, total_matched FROM runs WHERE id = ?"
       )
       .get(runId) as {
       finished_at: string;
       total_scraped: number;
       total_new: number;
+      total_matched: number;
     };
 
     assert.ok(run.finished_at.endsWith("Z"));
     assert.equal(run.total_scraped, 5);
     assert.equal(run.total_new, 2);
+    assert.equal(run.total_matched, 3);
   });
 
   it("loadActiveKeywords returns only active keywords", () => {

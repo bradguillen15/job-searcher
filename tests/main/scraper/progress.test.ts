@@ -65,6 +65,7 @@ describe("emitProgress", () => {
       runId: 1,
       totalScraped: 0,
       totalNew: 0,
+      totalMatched: 0,
     } as EmitPayload);
 
     assert.equal(captured.payload!.timestamp, "2026-06-08T12:00:00.000Z");

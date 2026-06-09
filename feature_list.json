@@ -62,7 +62,7 @@
       "name": "ai-matching",
       "description": "Ollama + Anthropic backends: resume skill profile (1 call, cached), batch scoring (5 jobs/call), match reason (top 10 jobs >= 70)",
       "sdd": true,
-      "status": "pending",
+      "status": "done",
       "priority": 8
     },
     {

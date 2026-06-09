@@ -9,6 +9,7 @@ export type ScraperRunResult =
       runId: number;
       totalScraped: number;
       totalNew: number;
+      totalMatched: number;
       boardErrors: Array<{ boardId: number; message: string }>;
     }
   | { error: string };
@@ -78,6 +79,28 @@ export type ProgressEvent =
       runId: number;
       totalScraped: number;
       totalNew: number;
+      totalMatched: number;
+    })
+  | (ProgressEventBase & {
+      type: "matching_start";
+      runId: number;
+    })
+  | (ProgressEventBase & {
+      type: "matching_phase";
+      phase: 1 | 2 | 3;
+      status: string;
+      detail?: string;
+    })
+  | (ProgressEventBase & {
+      type: "matching_batch";
+      batch: number;
+      totalBatches: number;
+      jobCount: number;
+    })
+  | (ProgressEventBase & {
+      type: "matching_complete";
+      runId: number;
+      totalMatched: number;
     })
   | (ProgressEventBase & {
       type: "run_error";

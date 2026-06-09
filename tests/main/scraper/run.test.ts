@@ -11,11 +11,13 @@ import {
 import {
   getRunState,
   provideSelector,
+  resetMatchingRunner,
   resetRunState,
   runScraper,
   ScraperBusyError,
   ScraperNotWaitingError,
   setBrowserFactory,
+  setMatchingRunner,
 } from "../../../src/main/scraper/run.js";
 
 function makeLocator(visible = true): Locator {
@@ -106,6 +108,7 @@ describe("runScraper orchestrator", () => {
 
   afterEach(() => {
     resetRunState();
+    resetMatchingRunner();
     setSelectorTimeoutMs(5000);
   });
 
@@ -264,6 +267,44 @@ describe("runScraper orchestrator", () => {
       finished_at: string | null;
     };
     assert.ok(run.finished_at);
+  });
+
+  it("invokes matching on successful scrape", async () => {
+    db.prepare("INSERT INTO boards (name, url, search_selector) VALUES (?, ?, ?)").run(
+      "B",
+      "https://board.example.com",
+      'input[type="search"]'
+    );
+    db.prepare("INSERT INTO keywords (keyword, active) VALUES (?, ?)").run(
+      "dev",
+      1
+    );
+
+    let matchingCalled = false;
+    setMatchingRunner(async (runId, emit) => {
+      matchingCalled = true;
+      emit({
+        type: "matching_complete",
+        timestamp: new Date().toISOString(),
+        runId,
+        totalMatched: 0,
+      });
+      return { totalMatched: 0, skipped: true, skipReason: "test" };
+    });
+
+    const result = await runScraper({ dateRange: "7d" }, emit);
+
+    assert.ok("runId" in result);
+    assert.equal(matchingCalled, true);
+    if ("runId" in result) {
+      assert.equal(result.totalMatched, 0);
+    }
+
+    const runComplete = events.find((e) => e.type === "run_complete");
+    assert.ok(runComplete);
+    if (runComplete?.type === "run_complete") {
+      assert.equal(runComplete.totalMatched, 0);
+    }
   });
 
   it("emits lifecycle progress events", async () => {

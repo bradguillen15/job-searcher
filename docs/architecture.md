@@ -31,6 +31,7 @@
 | `db.ts` | Opens SQLite via `better-sqlite3`, runs versioned migrations, exports active `db` |
 | `profiles.ts` | Multi-profile index (`profiles.json`), profile CRUD, switches active DB |
 | `migrations/*.sql` | Versioned DDL applied in lexicographic order |
+| `matcher/` | Three-phase AI matching pipeline (skill profile, batch scoring, match reasons) |
 
 ## Module map (`src/renderer/`)
 
@@ -74,7 +75,7 @@ handlers live in `ipc-handler.ts`.
 | `profiles:create` | renderer → main | `createProfile(name)` | implemented |
 | `profiles:switch` | renderer → main | `switchProfile(profileId)` | implemented |
 | `profiles:delete` | renderer → main | `deleteProfile(profileId)` | implemented |
-| `scraper:run` | renderer → main | `runScraper(payload)` — Playwright pipeline, `runs`/`jobs` persistence | implemented |
+| `scraper:run` | renderer → main | `runScraper(payload)` — Playwright pipeline, AI matching, `runs`/`jobs` persistence | implemented |
 | `scraper:provideSelector` | renderer → main | `provideSelector(payload)` — resume paused board after `selector_required` | implemented |
 | `scraper:progress` | main → renderer | `webContents.send` lifecycle events (`log`, `board_start`, `board_done`, `keyword_start`, `selector_required`, `run_complete`, `run_error`) | implemented |
 | `ollama:list` | renderer → main | stub | pending |
@@ -86,8 +87,28 @@ SELECT, `{ changes, lastInsertRowid }` for writes, or `{ error: string }` on
 failure.
 
 `scraper:run` payload: `{ dateRange: "24h" | "7d" | "30d" | "60d" | "90d" }`.
-Returns `{ runId, totalScraped, totalNew, boardErrors }` or `{ error: string }`.
+Returns `{ runId, totalScraped, totalNew, totalMatched, boardErrors }` or
+`{ error: string }`.
 Throws `ScraperBusyError` if a run is already active.
+
+After scraping completes, the main process runs the **AI matching pipeline**
+(`src/main/matcher/`) automatically for that run: Phase 1 skill profile (cached
+in `resume.skill_profile`), Phase 2 batch scoring (5 jobs per AI call, scores
+0–100), Phase 3 match reasons (jobs with score ≥ 70, max 10 calls). Matching
+uses Ollama or Anthropic based on settings; all HTTP calls stay in the main
+process. Early-exit scrape paths (no boards/keywords) and fatal scrape errors
+skip matching.
+
+**Settings keys** (read from `settings` table, used by matcher):
+
+| Key | Default |
+|-----|---------|
+| `ai.backend` | `"ollama"` |
+| `ollama.base_url` | `http://localhost:11434` |
+| `ollama.model` | `llama3.2` |
+
+Anthropic uses `ANTHROPIC_API_KEY` from `.env` (loaded via `dotenv` at main
+entry). Model fixed to `claude-3-5-haiku-20241022` until settings UI exists.
 
 `scraper:provideSelector` payload: `{ boardId, selector }` or
 `{ boardId, cancelled: true }`. Resolves the internal pause from
@@ -97,8 +118,10 @@ Throws `ScraperBusyError` if a run is already active.
 fields: `log` (`message`), `board_start` (`boardId`, `boardName`),
 `board_done` (`boardId`, `scraped`, `new`), `keyword_start` (`boardId`,
 `keywordId`, `keyword`), `selector_required` (`boardId`, `boardName`,
-`screenshotBase64`), `run_complete` (`runId`, `totalScraped`, `totalNew`),
-`run_error` (`message`).
+`screenshotBase64`), `matching_start` (`runId`), `matching_phase` (`phase`,
+`status`, optional `detail`), `matching_batch` (`batch`, `totalBatches`,
+`jobCount`), `matching_complete` (`runId`, `totalMatched`), `run_complete`
+(`runId`, `totalScraped`, `totalNew`, `totalMatched`), `run_error` (`message`).
 
 ## Database schema
 
