@@ -99,3 +99,18 @@
 - **Changes:** PipelineScreen kanban view grouped by pipeline status; quick-add activity; last activity date.
 - **Tests:** PipelineScreen, pipeline-db tests.
 - **Result:** All 13 tasks [x]. Reviewer approved.
+
+---
+
+## 2026-06-08 — settings-screen (done)
+- **Agent:** spec_author → implementer → reviewer (2 rounds)
+- **Changes:** SettingsScreen with AI backend selector, Ollama URL/models, Anthropic key persistence, theme toggle, default date range, DB path + Open in Finder.
+- **Tests:** SettingsScreen, settings-db, settings-env, profiles tests.
+- **Result:** All 21 tasks [x]. Reviewer approved.
+
+---
+
+## 2026-06-08 — Autonomous ROADMAP run complete
+- **Agent:** leader orchestrating spec_author → implementer → reviewer subagents
+- **Repository:** https://github.com/bradguillen15/job-searcher (11 commits: 1 baseline + 10 features)
+- **Result:** All 12 features `done`. `./init.sh` green.
