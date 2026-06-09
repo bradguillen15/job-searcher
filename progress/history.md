@@ -83,3 +83,11 @@
 - **Changes:** ScoutScreen with Run button, date range selector, live progress log, last run timestamp, per-board errors, selector dialog.
 - **Tests:** ScoutScreen.test.tsx, useScraperProgress.test.ts.
 - **Result:** All 17 tasks [x]. Reviewer approved.
+
+---
+
+## 2026-06-08 — results-screen (done)
+- **Agent:** spec_author → implementer → reviewer (2 rounds)
+- **Changes:** ResultsScreen with ranked jobs, status tabs, score slider, keyword chips, expandable cards, activity log.
+- **Tests:** ResultsScreen, results-styling, jobs-db tests.
+- **Result:** All 18 tasks [x]. Reviewer approved.

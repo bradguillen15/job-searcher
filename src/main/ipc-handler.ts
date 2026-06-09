@@ -1,4 +1,4 @@
-import { ipcMain } from "electron";
+import { ipcMain, shell } from "electron";
 import type Database from "better-sqlite3";
 import { db } from "./db";
 import {
@@ -43,6 +43,27 @@ export type QueryResult =
   | unknown[]
   | { changes: number; lastInsertRowid: number }
   | { error: string };
+
+export async function openPathOrUrl(
+  pathOrUrl: string
+): Promise<{ ok: true } | { error: string }> {
+  try {
+    if (
+      pathOrUrl.startsWith("http://") ||
+      pathOrUrl.startsWith("https://")
+    ) {
+      await shell.openExternal(pathOrUrl);
+    } else {
+      const result = await shell.openPath(pathOrUrl);
+      if (result) {
+        return { error: result };
+      }
+    }
+    return { ok: true };
+  } catch (err) {
+    return { error: (err as Error).message };
+  }
+}
 
 export function runQuery(
   database: Database.Database,
@@ -114,13 +135,18 @@ export function registerIpcHandlers(): void {
     }
   );
 
+  ipcMain.handle("fs:openPath", async (_event, pathOrUrl: string) =>
+    openPathOrUrl(pathOrUrl)
+  );
+
   for (const channel of ALLOWED_CHANNELS) {
     if (
       channel === "db:query" ||
       channel.startsWith("profiles:") ||
       channel === "resume:upload" ||
       channel === "scraper:run" ||
-      channel === "scraper:provideSelector"
+      channel === "scraper:provideSelector" ||
+      channel === "fs:openPath"
     ) {
       continue;
     }

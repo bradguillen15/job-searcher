@@ -76,7 +76,7 @@
       "name": "results-screen",
       "description": "Ranked job list, filter tabs by status, score threshold slider, keyword chips, expandable card with activity log + status controls",
       "sdd": true,
-      "status": "pending",
+      "status": "done",
       "priority": 10
     },
     {

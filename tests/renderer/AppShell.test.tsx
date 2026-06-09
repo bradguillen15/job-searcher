@@ -148,7 +148,9 @@ describe("AppShell", () => {
       {
         link: "Results",
         matcher: async () => {
-          expect(await screen.findByText("Results screen")).toBeTruthy();
+          expect(
+            await screen.findByRole("heading", { name: "Results" })
+          ).toBeTruthy();
         },
       },
       {
