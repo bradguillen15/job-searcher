@@ -36,7 +36,15 @@ function createTestRouter(initialPath = "/"): ReturnType<typeof createMemoryRout
 beforeEach(() => {
   localStorage.clear();
   document.documentElement.className = "dark";
-  mockInvoke.mockResolvedValue([{ id: "p1", name: "Default", active: true }]);
+  mockInvoke.mockImplementation((channel: string, payload?: { sql?: string }) => {
+    if (channel === "profiles:list") {
+      return Promise.resolve([{ id: "p1", name: "Default", active: true }]);
+    }
+    if (channel === "db:query" && payload?.sql?.includes("ORDER BY name ASC")) {
+      return Promise.resolve([]);
+    }
+    return Promise.reject(new Error("unexpected invoke"));
+  });
   Object.defineProperty(window, "api", {
     configurable: true,
     value: { invoke: mockInvoke },
@@ -122,7 +130,7 @@ describe("AppShell", () => {
       { link: "Scout", text: "Scout screen" },
       { link: "Results", text: "Results screen" },
       { link: "Pipeline", text: "Pipeline screen" },
-      { link: "Boards & Keywords", text: "Boards & Keywords screen" },
+      { link: "Boards & Keywords", text: "No boards yet. Add a board to start tracking job listings." },
       { link: "Resume", text: "Resume screen" },
       { link: "Settings", text: "Settings screen" },
     ];

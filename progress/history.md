@@ -35,3 +35,11 @@
 - **Changes:** Tailwind CSS + shadcn/ui init; globals.css with shadcn CSS vars; useTheme hook (dark/light on html); createHashRouter with AppShell/Sidebar/NavItem/ProfileSwitcher; 6 placeholder screens; drag region for Electron; profile switcher via profiles IPC.
 - **Tests:** useTheme, NavItem, ProfileSwitcher, AppShell, router, Sidebar, globals + extended coverage for R1–R18.
 - **Result:** All 14 tasks [x]. Reviewer approved. Committed and pushed to GitHub.
+
+---
+
+## 2026-06-08 — boards-management (done)
+- **Agent:** spec_author → implementer → reviewer
+- **Changes:** boards-db.ts CRUD via db:query; BoardForm, BoardList, BoardsScreen with shadcn dialog/alert-dialog; CSS selector per board.
+- **Tests:** boards-db.test.ts, BoardsScreen.test.tsx (21 new tests).
+- **Result:** All 9 tasks [x]. Reviewer approved.

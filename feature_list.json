@@ -27,7 +27,7 @@
       "name": "boards-management",
       "description": "CRUD UI + persistence for boards; saved CSS selector storage",
       "sdd": true,
-      "status": "pending",
+      "status": "done",
       "priority": 3
     },
     {
