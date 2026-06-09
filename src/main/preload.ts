@@ -8,7 +8,8 @@ export type ApiChannel =
   | "profiles:list"
   | "profiles:create"
   | "profiles:switch"
-  | "profiles:delete";
+  | "profiles:delete"
+  | "resume:upload";
 export type ProgressChannel = "scraper:progress";
 
 contextBridge.exposeInMainWorld("api", {

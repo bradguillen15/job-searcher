@@ -8,9 +8,9 @@
     "build": "vite build --config vite.config.ts && tsc -p tsconfig.main.json && electron-builder",
     "build:renderer": "vite build --config vite.config.ts",
     "build:main": "tsc -p tsconfig.main.json && cp -r src/main/migrations dist/main/migrations",
-    "test": "vitest run && npx tsx --require ./tests/main/electron-mock.cjs --test tests/main/ipc-handler.test.ts tests/db.test.ts tests/profiles.test.ts",
+    "test": "vitest run && npx tsx --require ./tests/main/electron-mock.cjs --test tests/main/ipc-handler.test.ts tests/main/resume-extract.test.ts tests/main/resume.test.ts tests/db.test.ts tests/profiles.test.ts",
     "test:renderer": "vitest run",
-    "test:main": "npx tsx --require ./tests/main/electron-mock.cjs --test tests/main/ipc-handler.test.ts tests/db.test.ts tests/profiles.test.ts",
+    "test:main": "npx tsx --require ./tests/main/electron-mock.cjs --test tests/main/ipc-handler.test.ts tests/main/resume-extract.test.ts tests/main/resume.test.ts tests/db.test.ts tests/profiles.test.ts",
     "package": "npm run build"
   },
   "dependencies": {
@@ -25,6 +25,8 @@
     "electron": "^31.0.0",
     "i18next": "^23.0.0",
     "lucide-react": "^1.17.0",
+    "mammoth": "^1.12.0",
+    "pdf-parse": "^2.4.5",
     "react": "^18.3.0",
     "react-dom": "^18.3.0",
     "react-i18next": "^14.0.0",
@@ -38,6 +40,7 @@
     "@testing-library/user-event": "^14.6.1",
     "@types/better-sqlite3": "^7.6.13",
     "@types/node": "^25.9.2",
+    "@types/pdf-parse": "^1.1.5",
     "@types/react": "^18.3.0",
     "@types/react-dom": "^18.3.0",
     "@vitejs/plugin-react": "^4.3.0",

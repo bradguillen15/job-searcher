@@ -23,6 +23,9 @@ Module._load = function (request, parent, isMain) {
         },
       },
       BrowserWindow: class {},
+      dialog: {
+        showOpenDialog: async () => ({ canceled: true, filePaths: [] }),
+      },
     };
   }
   return originalLoad.apply(this, arguments);

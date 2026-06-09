@@ -36,11 +36,11 @@ function createTestRouter(initialPath = "/"): ReturnType<typeof createMemoryRout
 beforeEach(() => {
   localStorage.clear();
   document.documentElement.className = "dark";
-  mockInvoke.mockImplementation((channel: string, payload?: { sql?: string }) => {
+  mockInvoke.mockImplementation((channel: string) => {
     if (channel === "profiles:list") {
       return Promise.resolve([{ id: "p1", name: "Default", active: true }]);
     }
-    if (channel === "db:query" && payload?.sql?.includes("ORDER BY name ASC")) {
+    if (channel === "db:query") {
       return Promise.resolve([]);
     }
     return Promise.reject(new Error("unexpected invoke"));
@@ -131,7 +131,7 @@ describe("AppShell", () => {
       { link: "Results", text: "Results screen" },
       { link: "Pipeline", text: "Pipeline screen" },
       { link: "Boards & Keywords", text: "No boards yet. Add a board to start tracking job listings." },
-      { link: "Resume", text: "Resume screen" },
+      { link: "Resume", text: "No resume uploaded yet" },
       { link: "Settings", text: "Settings screen" },
     ];
 
@@ -142,7 +142,13 @@ describe("AppShell", () => {
       if (route.link !== "Scout") {
         await user.click(await screen.findByRole("link", { name: route.link }));
       }
-      expect(await screen.findByText(route.text)).toBeTruthy();
+      if (route.link === "Resume") {
+        expect(
+          await screen.findByRole("button", { name: "Upload resume" })
+        ).toBeTruthy();
+      } else {
+        expect(await screen.findByText(route.text)).toBeTruthy();
+      }
     }
   });
 });

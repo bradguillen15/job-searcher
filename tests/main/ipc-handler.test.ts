@@ -54,6 +54,10 @@ describe("validateChannel", () => {
     assert.equal(validateChannel("profiles:delete"), "profiles:delete");
   });
 
+  it("accepts resume:upload", () => {
+    assert.equal(validateChannel("resume:upload"), "resume:upload");
+  });
+
   it("rejects unknown channel with UnknownChannelError", () => {
     assert.throws(
       () => validateChannel("bad:channel"),

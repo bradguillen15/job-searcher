@@ -78,6 +78,7 @@ handlers live in `ipc-handler.ts`.
 | `scraper:progress` | main → renderer | event | pending |
 | `ollama:list` | renderer → main | stub | pending |
 | `fs:openPath` | renderer → main | stub | pending |
+| `resume:upload` | renderer → main | `uploadResume()` — native file dialog, main-process read, pdf-parse/mammoth extract, DB upsert | implemented |
 
 `db:query` payload: `{ sql: string, params: unknown[] }`. Returns rows for
 SELECT, `{ changes, lastInsertRowid }` for writes, or `{ error: string }` on

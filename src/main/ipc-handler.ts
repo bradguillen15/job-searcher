@@ -7,6 +7,7 @@ import {
   listProfiles,
   switchProfile,
 } from "./profiles";
+import { uploadResume } from "./resume";
 
 export class UnknownChannelError extends Error {
   constructor(channel: string) {
@@ -24,6 +25,7 @@ const ALLOWED_CHANNELS = [
   "profiles:create",
   "profiles:switch",
   "profiles:delete",
+  "resume:upload",
 ] as const;
 export type AllowedChannel = (typeof ALLOWED_CHANNELS)[number];
 
@@ -78,10 +80,13 @@ export function registerIpcHandlers(): void {
     deleteProfile(profileId);
   });
 
+  ipcMain.handle("resume:upload", () => uploadResume());
+
   for (const channel of ALLOWED_CHANNELS) {
     if (
       channel === "db:query" ||
-      channel.startsWith("profiles:")
+      channel.startsWith("profiles:") ||
+      channel === "resume:upload"
     ) {
       continue;
     }

@@ -41,7 +41,7 @@
       "name": "resume-upload",
       "description": "Upload PDF/DOCX/TXT, extract raw text (pdf-parse + mammoth), store in DB",
       "sdd": true,
-      "status": "pending",
+      "status": "done",
       "priority": 5
     },
     {
