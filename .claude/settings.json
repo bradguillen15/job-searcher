@@ -1,0 +1,38 @@
+{
+  "$schema_comment": "Hooks that automate verification. The harness runs them, not the agent, so they cannot be skipped.",
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "if [ -f package.json ]; then (pnpm run test 2>/dev/null || npm test 2>/dev/null) | tail -3; else echo '[harness] no package.json'; fi",
+            "description": "After editing or writing files, run tests and show a short summary."
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "./init.sh > /tmp/harness_init.log 2>&1 && echo '[harness] init.sh OK' || (echo '[harness] init.sh FAILED — check /tmp/harness_init.log before closing' && cat /tmp/harness_init.log | tail -20)",
+            "description": "Before closing the session, force a full verification."
+          }
+        ]
+      }
+    ]
+  },
+  "permissions": {
+    "allow": [
+      "Bash(./init.sh)",
+      "Bash(npm test*)",
+      "Bash(npm run*)",
+      "Bash(pnpm test*)",
+      "Bash(pnpm run*)",
+      "Bash(npx tsc*)"
+    ]
+  }
+}

@@ -1,0 +1,97 @@
+{
+  "project": "job-searcher",
+  "description": "Job search tooling. Uses Harness Engineering for agent-driven development.",
+  "rules": {
+    "one_feature_at_a_time": true,
+    "require_tests_to_close": true,
+    "require_approved_spec_to_implement": true,
+    "valid_status": ["pending", "spec_ready", "in_progress", "done", "blocked"],
+    "sdd_required_when": "feature has \"sdd\": true"
+  },
+  "features": [
+    {
+      "name": "project-scaffold",
+      "description": "Electron + React + Vite skeleton, electron-builder config, IPC bridge, dev/prod scripts",
+      "sdd": true,
+      "status": "done",
+      "priority": 1
+    },
+    {
+      "name": "database-schema",
+      "description": "SQLite via better-sqlite3: all 7 tables (boards, keywords, resume, jobs, activities, runs, settings), migrations runner",
+      "sdd": true,
+      "status": "done",
+      "priority": 2
+    },
+    {
+      "name": "boards-management",
+      "description": "CRUD UI + persistence for boards; saved CSS selector storage",
+      "sdd": true,
+      "status": "pending",
+      "priority": 3
+    },
+    {
+      "name": "keywords-management",
+      "description": "CRUD UI + persistence for keywords; active/inactive toggle",
+      "sdd": true,
+      "status": "pending",
+      "priority": 4
+    },
+    {
+      "name": "resume-upload",
+      "description": "Upload PDF/DOCX/TXT, extract raw text (pdf-parse + mammoth), store in DB",
+      "sdd": true,
+      "status": "pending",
+      "priority": 5
+    },
+    {
+      "name": "navigation-layout",
+      "description": "Slack-style sidebar (Scout · Results · Pipeline · Boards & Keywords · Resume · Settings), dark/light theme toggle, Inter + JetBrains Mono fonts",
+      "sdd": true,
+      "status": "spec_ready",
+      "priority": 6
+    },
+    {
+      "name": "scraping-engine",
+      "description": "Playwright pipeline: navigate → find search bar (heuristic cascade + manual fallback) → search → paginate (date cutoff) → deduplicate → store",
+      "sdd": true,
+      "status": "pending",
+      "priority": 7
+    },
+    {
+      "name": "ai-matching",
+      "description": "Ollama + Anthropic backends: resume skill profile (1 call, cached), batch scoring (5 jobs/call), match reason (top 10 jobs >= 70)",
+      "sdd": true,
+      "status": "pending",
+      "priority": 8
+    },
+    {
+      "name": "scout-screen",
+      "description": "Run button, live progress log via IPC, date range selector (24h/7d/30d/60d/90d), last run timestamp, inline errors",
+      "sdd": true,
+      "status": "pending",
+      "priority": 9
+    },
+    {
+      "name": "results-screen",
+      "description": "Ranked job list, filter tabs by status, score threshold slider, keyword chips, expandable card with activity log + status controls",
+      "sdd": true,
+      "status": "pending",
+      "priority": 10
+    },
+    {
+      "name": "pipeline-screen",
+      "description": "Jobs in applying/applied/interviewing/offer/accepted/rejected grouped by status; quick-add activity button",
+      "sdd": true,
+      "status": "pending",
+      "priority": 11
+    },
+    {
+      "name": "settings-screen",
+      "description": "AI backend selector, Ollama URL + model dropdown (from ollama list), Anthropic API key (writes .env), theme toggle, default date range, DB path",
+      "sdd": true,
+      "status": "pending",
+      "priority": 12
+    }
+  ]
+}

@@ -1,0 +1,42 @@
+{
+  "name": "job-scout",
+  "version": "0.1.0",
+  "description": "JobScout — Electron app for job search automation",
+  "main": "dist/main/index.js",
+  "scripts": {
+    "dev": "tsc -p tsconfig.main.json && concurrently -k \"vite --config vite.config.ts\" \"tsc -p tsconfig.main.json -w\" \"wait-on http://localhost:5173 && electron .\"",
+    "build": "vite build --config vite.config.ts && tsc -p tsconfig.main.json && electron-builder",
+    "build:renderer": "vite build --config vite.config.ts",
+    "build:main": "tsc -p tsconfig.main.json && cp -r src/main/migrations dist/main/migrations",
+    "test": "vitest run && npx tsx --require ./tests/main/electron-mock.cjs --test tests/main/ipc-handler.test.ts tests/db.test.ts tests/profiles.test.ts",
+    "test:renderer": "vitest run",
+    "test:main": "npx tsx --require ./tests/main/electron-mock.cjs --test tests/main/ipc-handler.test.ts tests/db.test.ts tests/profiles.test.ts",
+    "package": "npm run build"
+  },
+  "dependencies": {
+    "@fontsource/inter": "^5.0.0",
+    "@fontsource/jetbrains-mono": "^5.0.0",
+    "better-sqlite3": "^12.10.0",
+    "dotenv": "^16.4.0",
+    "electron": "^31.0.0",
+    "i18next": "^23.0.0",
+    "react": "^18.3.0",
+    "react-dom": "^18.3.0",
+    "react-i18next": "^14.0.0"
+  },
+  "devDependencies": {
+    "@testing-library/react": "^15.0.0",
+    "@types/better-sqlite3": "^7.6.13",
+    "@types/react": "^18.3.0",
+    "@types/react-dom": "^18.3.0",
+    "@vitejs/plugin-react": "^4.3.0",
+    "concurrently": "^8.2.0",
+    "electron-builder": "^24.13.0",
+    "jsdom": "^24.0.0",
+    "tsx": "^4.22.4",
+    "typescript": "^5.4.0",
+    "vite": "^5.3.0",
+    "vitest": "^1.6.0",
+    "wait-on": "^7.2.0"
+  }
+}
