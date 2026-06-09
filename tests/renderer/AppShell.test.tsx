@@ -36,18 +36,30 @@ function createTestRouter(initialPath = "/"): ReturnType<typeof createMemoryRout
 beforeEach(() => {
   localStorage.clear();
   document.documentElement.className = "dark";
-  mockInvoke.mockImplementation((channel: string) => {
+  mockInvoke.mockImplementation((channel: string, payload?: { sql?: string }) => {
     if (channel === "profiles:list") {
       return Promise.resolve([{ id: "p1", name: "Default", active: true }]);
     }
     if (channel === "db:query") {
+      if (payload?.sql?.includes("FROM boards")) {
+        return Promise.resolve([]);
+      }
+      if (payload?.sql?.includes("FROM settings")) {
+        return Promise.resolve([]);
+      }
+      if (payload?.sql?.includes("FROM runs")) {
+        return Promise.resolve([]);
+      }
       return Promise.resolve([]);
     }
     return Promise.reject(new Error("unexpected invoke"));
   });
   Object.defineProperty(window, "api", {
     configurable: true,
-    value: { invoke: mockInvoke },
+    value: {
+      invoke: mockInvoke,
+      on: vi.fn(() => () => undefined),
+    },
   });
 });
 
@@ -124,15 +136,51 @@ describe("AppShell", () => {
     );
   });
 
-  it("shows placeholder text for each route", async () => {
+  it("shows screen content for each route", async () => {
     const user = userEvent.setup();
-    const routes: Array<{ link: string; text: string }> = [
-      { link: "Scout", text: "Scout screen" },
-      { link: "Results", text: "Results screen" },
-      { link: "Pipeline", text: "Pipeline screen" },
-      { link: "Boards & Keywords", text: "No boards yet. Add a board to start tracking job listings." },
-      { link: "Resume", text: "No resume uploaded yet" },
-      { link: "Settings", text: "Settings screen" },
+    const routes: Array<{ link: string; matcher: () => Promise<void> }> = [
+      {
+        link: "Scout",
+        matcher: async () => {
+          expect(await screen.findByRole("heading", { name: "Scout" })).toBeTruthy();
+        },
+      },
+      {
+        link: "Results",
+        matcher: async () => {
+          expect(await screen.findByText("Results screen")).toBeTruthy();
+        },
+      },
+      {
+        link: "Pipeline",
+        matcher: async () => {
+          expect(await screen.findByText("Pipeline screen")).toBeTruthy();
+        },
+      },
+      {
+        link: "Boards & Keywords",
+        matcher: async () => {
+          expect(
+            await screen.findByText(
+              "No boards yet. Add a board to start tracking job listings."
+            )
+          ).toBeTruthy();
+        },
+      },
+      {
+        link: "Resume",
+        matcher: async () => {
+          expect(
+            await screen.findByRole("button", { name: "Upload resume" })
+          ).toBeTruthy();
+        },
+      },
+      {
+        link: "Settings",
+        matcher: async () => {
+          expect(await screen.findByText("Settings screen")).toBeTruthy();
+        },
+      },
     ];
 
     const router = createTestRouter();
@@ -142,13 +190,7 @@ describe("AppShell", () => {
       if (route.link !== "Scout") {
         await user.click(await screen.findByRole("link", { name: route.link }));
       }
-      if (route.link === "Resume") {
-        expect(
-          await screen.findByRole("button", { name: "Upload resume" })
-        ).toBeTruthy();
-      } else {
-        expect(await screen.findByText(route.text)).toBeTruthy();
-      }
+      await route.matcher();
     }
   });
 });

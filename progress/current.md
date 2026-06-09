@@ -1,18 +1,19 @@
 # Current session
 
-- **Feature in progress:** ai-matching
+- **Feature in progress:** scout-screen
 - **Started:** 2026-06-08
 - **Agent:** implementer
 
 ## Plan
 
-Tasks T1–T28 from `specs/ai-matching/tasks.md`.
+Tasks T1–T17 from `specs/scout-screen/tasks.md`.
 
 ## Log
 
-- T1–T28 complete: matcher modules, scraper integration, tests.
-- `./init.sh` green; traceability in `progress/impl_ai-matching.md`.
+- T1–T17 complete: Scout UI, IPC progress hook, db helpers, tests.
+- `./init.sh` green; traceability in `progress/impl_scout-screen.md`.
+- Feature status: `in_progress` (not marked `done`).
 
 ## Next step
 
-Launch reviewer for ai-matching.
+Launch reviewer for scout-screen.

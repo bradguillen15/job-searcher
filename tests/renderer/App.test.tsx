@@ -4,12 +4,30 @@ import React from "react";
 
 beforeEach(() => {
   vi.stubGlobal("api", {
-    invoke: vi.fn().mockResolvedValue([{ id: "p1", name: "Default", active: true }]),
+    invoke: vi.fn().mockImplementation((channel: string) => {
+      if (channel === "profiles:list") {
+        return Promise.resolve([{ id: "p1", name: "Default", active: true }]);
+      }
+      if (channel === "db:query") {
+        return Promise.resolve([]);
+      }
+      return Promise.resolve([]);
+    }),
+    on: vi.fn(() => () => undefined),
   });
   Object.defineProperty(window, "api", {
     configurable: true,
     value: {
-      invoke: vi.fn().mockResolvedValue([{ id: "p1", name: "Default", active: true }]),
+      invoke: vi.fn().mockImplementation((channel: string) => {
+        if (channel === "profiles:list") {
+          return Promise.resolve([{ id: "p1", name: "Default", active: true }]);
+        }
+        if (channel === "db:query") {
+          return Promise.resolve([]);
+        }
+        return Promise.resolve([]);
+      }),
+      on: vi.fn(() => () => undefined),
     },
   });
 });

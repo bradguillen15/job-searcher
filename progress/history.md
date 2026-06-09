@@ -75,3 +75,11 @@
 - **Changes:** Three-phase AI pipeline (skill profile, batch scoring, match reasons); Ollama + Anthropic backends; integrated into scraper run.
 - **Tests:** matcher unit tests with mocked fetch (126 total).
 - **Result:** All 28 tasks [x]. Reviewer approved.
+
+---
+
+## 2026-06-08 — scout-screen (done)
+- **Agent:** spec_author → implementer → reviewer (2 rounds)
+- **Changes:** ScoutScreen with Run button, date range selector, live progress log, last run timestamp, per-board errors, selector dialog.
+- **Tests:** ScoutScreen.test.tsx, useScraperProgress.test.ts.
+- **Result:** All 17 tasks [x]. Reviewer approved.

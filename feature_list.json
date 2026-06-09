@@ -69,7 +69,7 @@
       "name": "scout-screen",
       "description": "Run button, live progress log via IPC, date range selector (24h/7d/30d/60d/90d), last run timestamp, inline errors",
       "sdd": true,
-      "status": "pending",
+      "status": "done",
       "priority": 9
     },
     {
