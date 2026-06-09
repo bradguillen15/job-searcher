@@ -58,6 +58,10 @@ describe("validateChannel", () => {
     assert.equal(validateChannel("resume:upload"), "resume:upload");
   });
 
+  it("accepts scraper:provideSelector", () => {
+    assert.equal(validateChannel("scraper:provideSelector"), "scraper:provideSelector");
+  });
+
   it("rejects unknown channel with UnknownChannelError", () => {
     assert.throws(
       () => validateChannel("bad:channel"),

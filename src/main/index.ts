@@ -3,6 +3,9 @@ import { app, BrowserWindow } from "electron";
 import path from "path";
 import { registerIpcHandlers } from "./ipc-handler";
 import { loadActiveProfile } from "./profiles";
+import { setMainWindow } from "./main-window";
+
+export { getMainWindow } from "./main-window";
 
 const VITE_DEV_URL = "http://localhost:5173";
 
@@ -28,6 +31,11 @@ function createWindow(): BrowserWindow {
     const indexPath = path.join(__dirname, "../renderer/index.html");
     win.loadFile(indexPath);
   }
+
+  setMainWindow(win);
+  win.on("closed", () => {
+    setMainWindow(null);
+  });
 
   return win;
 }

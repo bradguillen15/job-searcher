@@ -51,3 +51,11 @@
 - **Changes:** keywords-db.ts; KeywordForm/KeywordList on BoardsScreen; active/inactive toggle via shadcn Switch.
 - **Tests:** keywords-db.test.ts, KeywordsScreen integration tests.
 - **Result:** All 9 tasks [x]. Reviewer approved.
+
+---
+
+## 2026-06-08 — resume-upload (done)
+- **Agent:** spec_author → implementer → reviewer
+- **Changes:** resume.ts main module; resume:upload IPC with pdf-parse + mammoth; ResumeScreen upload UI; DB upsert for resume table.
+- **Tests:** resume.test.ts, ResumeScreen tests, IPC tests.
+- **Result:** All 14 tasks [x]. Reviewer approved.

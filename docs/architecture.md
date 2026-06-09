@@ -74,8 +74,9 @@ handlers live in `ipc-handler.ts`.
 | `profiles:create` | renderer → main | `createProfile(name)` | implemented |
 | `profiles:switch` | renderer → main | `switchProfile(profileId)` | implemented |
 | `profiles:delete` | renderer → main | `deleteProfile(profileId)` | implemented |
-| `scraper:run` | renderer → main | stub | pending |
-| `scraper:progress` | main → renderer | event | pending |
+| `scraper:run` | renderer → main | `runScraper(payload)` — Playwright pipeline, `runs`/`jobs` persistence | implemented |
+| `scraper:provideSelector` | renderer → main | `provideSelector(payload)` — resume paused board after `selector_required` | implemented |
+| `scraper:progress` | main → renderer | `webContents.send` lifecycle events (`log`, `board_start`, `board_done`, `keyword_start`, `selector_required`, `run_complete`, `run_error`) | implemented |
 | `ollama:list` | renderer → main | stub | pending |
 | `fs:openPath` | renderer → main | stub | pending |
 | `resume:upload` | renderer → main | `uploadResume()` — native file dialog, main-process read, pdf-parse/mammoth extract, DB upsert | implemented |
@@ -83,6 +84,21 @@ handlers live in `ipc-handler.ts`.
 `db:query` payload: `{ sql: string, params: unknown[] }`. Returns rows for
 SELECT, `{ changes, lastInsertRowid }` for writes, or `{ error: string }` on
 failure.
+
+`scraper:run` payload: `{ dateRange: "24h" | "7d" | "30d" | "60d" | "90d" }`.
+Returns `{ runId, totalScraped, totalNew, boardErrors }` or `{ error: string }`.
+Throws `ScraperBusyError` if a run is already active.
+
+`scraper:provideSelector` payload: `{ boardId, selector }` or
+`{ boardId, cancelled: true }`. Resolves the internal pause from
+`selector_required`; throws `ScraperNotWaitingError` when not paused.
+
+`scraper:progress` payloads include `{ type, timestamp }` plus type-specific
+fields: `log` (`message`), `board_start` (`boardId`, `boardName`),
+`board_done` (`boardId`, `scraped`, `new`), `keyword_start` (`boardId`,
+`keywordId`, `keyword`), `selector_required` (`boardId`, `boardName`,
+`screenshotBase64`), `run_complete` (`runId`, `totalScraped`, `totalNew`),
+`run_error` (`message`).
 
 ## Database schema
 

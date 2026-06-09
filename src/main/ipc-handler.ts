@@ -8,6 +8,15 @@ import {
   switchProfile,
 } from "./profiles";
 import { uploadResume } from "./resume";
+import { getMainWindow } from "./main-window";
+import { createProgressEmitter } from "./scraper/progress";
+import {
+  provideSelector,
+  runScraper,
+  ScraperBusyError,
+  ScraperNotWaitingError,
+} from "./scraper/run";
+import type { ScraperProvideSelectorPayload, ScraperRunPayload } from "./scraper/types";
 
 export class UnknownChannelError extends Error {
   constructor(channel: string) {
@@ -19,6 +28,7 @@ export class UnknownChannelError extends Error {
 const ALLOWED_CHANNELS = [
   "db:query",
   "scraper:run",
+  "scraper:provideSelector",
   "ollama:list",
   "fs:openPath",
   "profiles:list",
@@ -61,6 +71,10 @@ export function runQuery(
   }
 }
 
+const progressEmitter = createProgressEmitter(
+  () => getMainWindow()?.webContents
+);
+
 export function registerIpcHandlers(): void {
   ipcMain.handle(
     "db:query",
@@ -82,11 +96,31 @@ export function registerIpcHandlers(): void {
 
   ipcMain.handle("resume:upload", () => uploadResume());
 
+  ipcMain.handle("scraper:run", async (_event, payload: ScraperRunPayload) => {
+    try {
+      return await runScraper(payload, progressEmitter);
+    } catch (err) {
+      if (err instanceof ScraperBusyError) {
+        throw err;
+      }
+      return { error: (err as Error).message };
+    }
+  });
+
+  ipcMain.handle(
+    "scraper:provideSelector",
+    (_event, payload: ScraperProvideSelectorPayload) => {
+      provideSelector(payload);
+    }
+  );
+
   for (const channel of ALLOWED_CHANNELS) {
     if (
       channel === "db:query" ||
       channel.startsWith("profiles:") ||
-      channel === "resume:upload"
+      channel === "resume:upload" ||
+      channel === "scraper:run" ||
+      channel === "scraper:provideSelector"
     ) {
       continue;
     }
@@ -102,3 +136,5 @@ export function validateChannel(channel: string): AllowedChannel {
   }
   throw new UnknownChannelError(channel);
 }
+
+export { ScraperBusyError, ScraperNotWaitingError };

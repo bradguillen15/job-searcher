@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Pagination</title>
+  </head>
+  <body>
+    <main id="page-content">
+      <article class="job-card">
+        <h2><a href="/jobs/recent">Recent Role</a></h2>
+        <time datetime="2026-06-08T00:00:00.000Z">Today</time>
+      </article>
+      <article class="job-card">
+        <h2><a href="/jobs/old">Old Role</a></h2>
+        <time datetime="2026-01-01T00:00:00.000Z">2026-01-01</time>
+      </article>
+    </main>
+    <nav>
+      <a rel="next" href="?page=2" id="next-link">Next</a>
+    </nav>
+    <script>
+      document.getElementById("next-link").addEventListener("click", (e) => {
+        e.preventDefault();
+        document.getElementById("page-content").innerHTML = `
+          <article class="job-card">
+            <h2><a href="/jobs/page2">Page 2 Job</a></h2>
+            <time datetime="2026-06-07T00:00:00.000Z">Yesterday</time>
+          </article>
+        `;
+      });
+    </script>
+  </body>
+</html>

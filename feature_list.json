@@ -55,7 +55,7 @@
       "name": "scraping-engine",
       "description": "Playwright pipeline: navigate → find search bar (heuristic cascade + manual fallback) → search → paginate (date cutoff) → deduplicate → store",
       "sdd": true,
-      "status": "pending",
+      "status": "done",
       "priority": 7
     },
     {

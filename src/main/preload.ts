@@ -3,6 +3,7 @@ import { contextBridge, ipcRenderer } from "electron";
 export type ApiChannel =
   | "db:query"
   | "scraper:run"
+  | "scraper:provideSelector"
   | "ollama:list"
   | "fs:openPath"
   | "profiles:list"
