@@ -43,3 +43,11 @@
 - **Changes:** boards-db.ts CRUD via db:query; BoardForm, BoardList, BoardsScreen with shadcn dialog/alert-dialog; CSS selector per board.
 - **Tests:** boards-db.test.ts, BoardsScreen.test.tsx (21 new tests).
 - **Result:** All 9 tasks [x]. Reviewer approved.
+
+---
+
+## 2026-06-08 — keywords-management (done)
+- **Agent:** spec_author → implementer → reviewer
+- **Changes:** keywords-db.ts; KeywordForm/KeywordList on BoardsScreen; active/inactive toggle via shadcn Switch.
+- **Tests:** keywords-db.test.ts, KeywordsScreen integration tests.
+- **Result:** All 9 tasks [x]. Reviewer approved.

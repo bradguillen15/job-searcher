@@ -34,7 +34,7 @@
       "name": "keywords-management",
       "description": "CRUD UI + persistence for keywords; active/inactive toggle",
       "sdd": true,
-      "status": "pending",
+      "status": "done",
       "priority": 4
     },
     {

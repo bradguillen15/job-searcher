@@ -1,6 +1,10 @@
 import React, { useCallback, useEffect, useState } from "react";
 import BoardForm, { type BoardFormValues } from "@/components/boards/BoardForm";
 import BoardList from "@/components/boards/BoardList";
+import KeywordForm, {
+  type KeywordFormValues,
+} from "@/components/keywords/KeywordForm";
+import KeywordList from "@/components/keywords/KeywordList";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -25,7 +29,15 @@ import {
   listBoards,
   updateBoard,
 } from "@/lib/boards-db";
+import {
+  KeywordsDbError,
+  createKeyword,
+  deleteKeyword,
+  listKeywords,
+  setKeywordActive,
+} from "@/lib/keywords-db";
 import type { Board } from "@/types/board";
+import type { Keyword } from "@/types/keyword";
 import { cn } from "@/lib/utils";
 
 function toFormValues(board: Board): BoardFormValues {
@@ -45,6 +57,14 @@ function BoardsScreen(): React.JSX.Element {
   const [deleteTarget, setDeleteTarget] = useState<Board | null>(null);
   const [pending, setPending] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
+  const [keywords, setKeywords] = useState<Keyword[]>([]);
+  const [keywordsLoading, setKeywordsLoading] = useState(true);
+  const [keywordsError, setKeywordsError] = useState<string | null>(null);
+  const [keywordDialogOpen, setKeywordDialogOpen] = useState(false);
+  const [keywordDeleteTarget, setKeywordDeleteTarget] =
+    useState<Keyword | null>(null);
+  const [keywordsPending, setKeywordsPending] = useState(false);
+  const [keywordFormError, setKeywordFormError] = useState<string | null>(null);
 
   const refreshBoards = useCallback(async (): Promise<void> => {
     const rows = await listBoards();
@@ -76,6 +96,44 @@ function BoardsScreen(): React.JSX.Element {
     }
 
     void loadBoards();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const refreshKeywords = useCallback(async (): Promise<void> => {
+    const rows = await listKeywords();
+    setKeywords(rows);
+  }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadKeywords(): Promise<void> {
+      try {
+        const rows = await listKeywords();
+        if (!cancelled) {
+          setKeywords(rows);
+          setKeywordsError(null);
+        }
+      } catch (err) {
+        if (!cancelled) {
+          const message =
+            err instanceof KeywordsDbError
+              ? err.message
+              : "Unable to load keywords";
+          setKeywordsError(message);
+          setKeywords([]);
+        }
+      } finally {
+        if (!cancelled) {
+          setKeywordsLoading(false);
+        }
+      }
+    }
+
+    void loadKeywords();
 
     return () => {
       cancelled = true;
@@ -159,6 +217,87 @@ function BoardsScreen(): React.JSX.Element {
       setPending(false);
     }
   }, [deleteTarget, refreshBoards]);
+
+  const openKeywordDialog = useCallback((): void => {
+    setKeywordFormError(null);
+    setKeywordDialogOpen(true);
+  }, []);
+
+  const closeKeywordDialog = useCallback((): void => {
+    if (keywordsPending) {
+      return;
+    }
+    setKeywordDialogOpen(false);
+    setKeywordFormError(null);
+  }, [keywordsPending]);
+
+  const handleKeywordFormSubmit = useCallback(
+    async (values: KeywordFormValues): Promise<void> => {
+      setKeywordsPending(true);
+      setKeywordFormError(null);
+
+      try {
+        await createKeyword({ keyword: values.keyword });
+        await refreshKeywords();
+        setKeywordDialogOpen(false);
+        setKeywordsError(null);
+      } catch (err) {
+        const message =
+          err instanceof KeywordsDbError
+            ? err.message
+            : "Unable to save keyword";
+        setKeywordFormError(message);
+      } finally {
+        setKeywordsPending(false);
+      }
+    },
+    [refreshKeywords]
+  );
+
+  const handleKeywordToggle = useCallback(
+    async (keyword: Keyword, active: boolean): Promise<void> => {
+      setKeywordsPending(true);
+      setKeywordsError(null);
+
+      try {
+        await setKeywordActive(keyword.id, active);
+        await refreshKeywords();
+      } catch (err) {
+        const message =
+          err instanceof KeywordsDbError
+            ? err.message
+            : "Unable to update keyword";
+        setKeywordsError(message);
+      } finally {
+        setKeywordsPending(false);
+      }
+    },
+    [refreshKeywords]
+  );
+
+  const handleKeywordDeleteConfirm = useCallback(async (): Promise<void> => {
+    if (keywordDeleteTarget === null) {
+      return;
+    }
+
+    setKeywordsPending(true);
+    setKeywordsError(null);
+
+    try {
+      await deleteKeyword(keywordDeleteTarget.id);
+      await refreshKeywords();
+      setKeywordDeleteTarget(null);
+    } catch (err) {
+      const message =
+        err instanceof KeywordsDbError
+          ? err.message
+          : "Unable to delete keyword";
+      setKeywordsError(message);
+      setKeywordDeleteTarget(null);
+    } finally {
+      setKeywordsPending(false);
+    }
+  }, [keywordDeleteTarget, refreshKeywords]);
 
   return (
     <div className="space-y-6 p-6">
@@ -245,6 +384,97 @@ function BoardsScreen(): React.JSX.Element {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <div className="space-y-4 border-t border-border pt-6">
+        <div className="flex items-center justify-between gap-4">
+          <h2 className="text-2xl font-semibold">Keywords</h2>
+          <Button type="button" onClick={openKeywordDialog}>
+            Add keyword
+          </Button>
+        </div>
+
+        {keywordsError !== null ? (
+          <div
+            className={cn(
+              "rounded-md border border-destructive/40 px-3 py-2 text-sm text-destructive"
+            )}
+            role="alert"
+          >
+            {keywordsError}
+          </div>
+        ) : null}
+
+        {keywordsLoading ? (
+          <p className="text-sm text-muted-foreground">Loading keywords…</p>
+        ) : (
+          <KeywordList
+            keywords={keywords}
+            pending={keywordsPending}
+            onToggleActive={(keyword, active) => {
+              void handleKeywordToggle(keyword, active);
+            }}
+            onDelete={setKeywordDeleteTarget}
+          />
+        )}
+
+        <Dialog
+          open={keywordDialogOpen}
+          onOpenChange={(open) => !open && closeKeywordDialog()}
+        >
+          <DialogContent showCloseButton={!keywordsPending}>
+            <DialogHeader>
+              <DialogTitle>Add keyword</DialogTitle>
+            </DialogHeader>
+            <KeywordForm
+              submitLabel="Add keyword"
+              pending={keywordsPending}
+              onSubmit={(values) => {
+                void handleKeywordFormSubmit(values);
+              }}
+              onCancel={closeKeywordDialog}
+            />
+            {keywordFormError !== null ? (
+              <p className="text-sm text-destructive" role="alert">
+                {keywordFormError}
+              </p>
+            ) : null}
+          </DialogContent>
+        </Dialog>
+
+        <AlertDialog
+          open={keywordDeleteTarget !== null}
+          onOpenChange={(open) => {
+            if (!open && !keywordsPending) {
+              setKeywordDeleteTarget(null);
+            }
+          }}
+        >
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Delete keyword?</AlertDialogTitle>
+              <AlertDialogDescription>
+                {keywordDeleteTarget !== null
+                  ? `This will permanently remove "${keywordDeleteTarget.keyword}".`
+                  : ""}
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel disabled={keywordsPending}>
+                Cancel
+              </AlertDialogCancel>
+              <AlertDialogAction
+                variant="destructive"
+                disabled={keywordsPending}
+                onClick={() => {
+                  void handleKeywordDeleteConfirm();
+                }}
+              >
+                Delete
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+      </div>
     </div>
   );
 }
