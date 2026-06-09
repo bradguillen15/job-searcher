@@ -1,5 +1,10 @@
-import type { Activity, JobStatus, JobWithMeta } from "@/types/job";
-import { isJobStatus } from "@/types/job";
+import type {
+  Activity,
+  JobStatus,
+  JobWithMeta,
+  PipelineJobWithMeta,
+} from "@/types/job";
+import { isJobStatus, isPipelineStatus, PIPELINE_STATUSES } from "@/types/job";
 
 export type DbQueryError = { error: string };
 
@@ -31,6 +36,35 @@ FROM jobs j
 INNER JOIN boards b ON j.board_id = b.id
 INNER JOIN keywords k ON j.keyword_id = k.id
 ORDER BY j.score IS NULL, j.score DESC, j.scraped_at DESC`;
+
+export const LIST_PIPELINE_JOBS_SQL = `SELECT
+  j.id,
+  j.board_id,
+  j.keyword_id,
+  j.run_id,
+  j.title,
+  j.company,
+  j.location,
+  j.posted_date,
+  j.description,
+  j.url,
+  j.score,
+  j.match_reason,
+  j.status,
+  j.scraped_at,
+  b.name AS board_name,
+  k.keyword AS keyword_text,
+  la.last_activity_at
+FROM jobs j
+INNER JOIN boards b ON j.board_id = b.id
+INNER JOIN keywords k ON j.keyword_id = k.id
+LEFT JOIN (
+  SELECT job_id, MAX(created_at) AS last_activity_at
+  FROM activities
+  GROUP BY job_id
+) la ON la.job_id = j.id
+WHERE j.status IN (?, ?, ?, ?, ?, ?)
+ORDER BY j.status, la.last_activity_at IS NULL, la.last_activity_at DESC, j.title ASC`;
 
 const LIST_ACTIVITIES_SQL = `SELECT id, job_id, type, notes, scheduled_at, created_at
 FROM activities
@@ -92,6 +126,27 @@ function mapJobRow(row: Record<string, unknown>): JobWithMeta {
 export async function listJobsWithMeta(): Promise<JobWithMeta[]> {
   const result = await dbQuery(LIST_JOBS_SQL, []);
   return (result as Record<string, unknown>[]).map(mapJobRow);
+}
+
+function mapPipelineJobRow(row: Record<string, unknown>): PipelineJobWithMeta | null {
+  const job = mapJobRow(row);
+  if (!isPipelineStatus(job.status)) {
+    return null;
+  }
+  return {
+    ...job,
+    last_activity_at:
+      row.last_activity_at != null ? String(row.last_activity_at) : null,
+  };
+}
+
+export async function listPipelineJobsWithMeta(): Promise<PipelineJobWithMeta[]> {
+  const result = await dbQuery(LIST_PIPELINE_JOBS_SQL, [
+    ...PIPELINE_STATUSES,
+  ]);
+  return (result as Record<string, unknown>[])
+    .map(mapPipelineJobRow)
+    .filter((job): job is PipelineJobWithMeta => job !== null);
 }
 
 export async function listActivities(jobId: number): Promise<Activity[]> {

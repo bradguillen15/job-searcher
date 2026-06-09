@@ -156,7 +156,9 @@ describe("AppShell", () => {
       {
         link: "Pipeline",
         matcher: async () => {
-          expect(await screen.findByText("Pipeline screen")).toBeTruthy();
+          expect(
+            await screen.findByRole("heading", { name: "Pipeline" })
+          ).toBeTruthy();
         },
       },
       {

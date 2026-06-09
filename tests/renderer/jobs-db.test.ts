@@ -1,12 +1,15 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import {
   LIST_JOBS_SQL,
+  LIST_PIPELINE_JOBS_SQL,
   listJobsWithMeta,
+  listPipelineJobsWithMeta,
   listActivities,
   addActivity,
   updateJobStatus,
   JobsDbError,
 } from "../../src/renderer/lib/jobs-db";
+import { PIPELINE_STATUSES } from "../../src/renderer/types/job";
 
 const mockInvoke = vi.fn();
 
@@ -138,6 +141,58 @@ describe("jobs-db", () => {
         sql: "UPDATE jobs SET status = ? WHERE id = ?",
         params: ["applied", 5],
       });
+    });
+  });
+
+  describe("listPipelineJobsWithMeta", () => {
+    const pipelineJobRow = {
+      ...sampleJobRow,
+      status: "applying",
+      last_activity_at: "2026-06-08T14:00:00.000Z",
+    };
+
+    it("invokes db:query with pipeline WHERE and LEFT JOIN aggregate SQL", async () => {
+      mockInvoke.mockResolvedValue([pipelineJobRow]);
+
+      const result = await listPipelineJobsWithMeta();
+
+      expect(mockInvoke).toHaveBeenCalledWith("db:query", {
+        sql: LIST_PIPELINE_JOBS_SQL,
+        params: [...PIPELINE_STATUSES],
+      });
+      expect(LIST_PIPELINE_JOBS_SQL).toContain("LEFT JOIN");
+      expect(LIST_PIPELINE_JOBS_SQL).toContain("WHERE j.status IN (?, ?, ?, ?, ?, ?)");
+      expect(result).toHaveLength(1);
+      expect(result[0]?.status).toBe("applying");
+    });
+
+    it("maps last_activity_at when present and null when absent", async () => {
+      mockInvoke.mockResolvedValue([
+        pipelineJobRow,
+        { ...pipelineJobRow, id: 2, title: "No Activity", last_activity_at: null },
+      ]);
+
+      const result = await listPipelineJobsWithMeta();
+
+      expect(result[0]?.last_activity_at).toBe("2026-06-08T14:00:00.000Z");
+      expect(result[1]?.last_activity_at).toBeNull();
+    });
+
+    it("skips rows with non-pipeline status defensively", async () => {
+      mockInvoke.mockResolvedValue([
+        { ...pipelineJobRow, status: "new", last_activity_at: null },
+      ]);
+
+      const result = await listPipelineJobsWithMeta();
+
+      expect(result).toHaveLength(0);
+    });
+
+    it("throws JobsDbError when db:query returns error", async () => {
+      mockInvoke.mockResolvedValue({ error: "disk I/O error" });
+
+      await expect(listPipelineJobsWithMeta()).rejects.toThrow(JobsDbError);
+      await expect(listPipelineJobsWithMeta()).rejects.toThrow("disk I/O error");
     });
   });
 });

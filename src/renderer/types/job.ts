@@ -95,3 +95,20 @@ export function formatStatusLabel(status: JobStatus): string {
 export function isJobStatus(value: string): value is JobStatus {
   return (JOB_STATUSES as readonly string[]).includes(value);
 }
+
+export const PIPELINE_STATUSES: readonly JobStatus[] = [
+  "applying",
+  "applied",
+  "interviewing",
+  "offer",
+  "accepted",
+  "rejected",
+];
+
+export interface PipelineJobWithMeta extends JobWithMeta {
+  last_activity_at: string | null;
+}
+
+export function isPipelineStatus(status: JobStatus): boolean {
+  return (PIPELINE_STATUSES as readonly JobStatus[]).includes(status);
+}

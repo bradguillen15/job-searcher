@@ -83,7 +83,7 @@
       "name": "pipeline-screen",
       "description": "Jobs in applying/applied/interviewing/offer/accepted/rejected grouped by status; quick-add activity button",
       "sdd": true,
-      "status": "pending",
+      "status": "done",
       "priority": 11
     },
     {

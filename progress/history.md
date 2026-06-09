@@ -91,3 +91,11 @@
 - **Changes:** ResultsScreen with ranked jobs, status tabs, score slider, keyword chips, expandable cards, activity log.
 - **Tests:** ResultsScreen, results-styling, jobs-db tests.
 - **Result:** All 18 tasks [x]. Reviewer approved.
+
+---
+
+## 2026-06-08 — pipeline-screen (done)
+- **Agent:** spec_author → implementer → reviewer
+- **Changes:** PipelineScreen kanban view grouped by pipeline status; quick-add activity; last activity date.
+- **Tests:** PipelineScreen, pipeline-db tests.
+- **Result:** All 13 tasks [x]. Reviewer approved.

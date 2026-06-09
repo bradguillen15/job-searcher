@@ -32,7 +32,9 @@ describe("results-screen styling", () => {
     const rendererRoot = resolve(__dirname, "../../src/renderer");
     const files = [
       ...collectSourceFiles(join(rendererRoot, "components/results")),
+      ...collectSourceFiles(join(rendererRoot, "components/pipeline")),
       join(rendererRoot, "screens/ResultsScreen.tsx"),
+      join(rendererRoot, "screens/PipelineScreen.tsx"),
     ];
 
     for (const file of files) {
