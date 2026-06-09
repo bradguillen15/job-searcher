@@ -38,6 +38,27 @@ describe("validateChannel", () => {
     assert.equal(validateChannel("fs:openPath"), "fs:openPath");
   });
 
+  it("accepts settings:saveAnthropicKey", () => {
+    assert.equal(
+      validateChannel("settings:saveAnthropicKey"),
+      "settings:saveAnthropicKey"
+    );
+  });
+
+  it("accepts settings:anthropicKeyStatus", () => {
+    assert.equal(
+      validateChannel("settings:anthropicKeyStatus"),
+      "settings:anthropicKeyStatus"
+    );
+  });
+
+  it("accepts profiles:activeDbPath", () => {
+    assert.equal(
+      validateChannel("profiles:activeDbPath"),
+      "profiles:activeDbPath"
+    );
+  });
+
   it("accepts profiles:list", () => {
     assert.equal(validateChannel("profiles:list"), "profiles:list");
   });

@@ -78,8 +78,11 @@ handlers live in `ipc-handler.ts`.
 | `scraper:run` | renderer → main | `runScraper(payload)` — Playwright pipeline, AI matching, `runs`/`jobs` persistence | implemented |
 | `scraper:provideSelector` | renderer → main | `provideSelector(payload)` — resume paused board after `selector_required` | implemented |
 | `scraper:progress` | main → renderer | `webContents.send` lifecycle events (`log`, `board_start`, `board_done`, `keyword_start`, `selector_required`, `run_complete`, `run_error`) | implemented |
-| `ollama:list` | renderer → main | stub | pending |
-| `fs:openPath` | renderer → main | stub | pending |
+| `ollama:list` | renderer → main | `listOllamaModels(baseUrl)` — GET `{baseUrl}/api/tags` | implemented |
+| `fs:openPath` | renderer → main | `openPathOrUrl(pathOrUrl)` — `shell.openPath` or `shell.openExternal` | implemented |
+| `settings:saveAnthropicKey` | renderer → main | `saveAnthropicApiKey(apiKey)` — writes `{userData}/.env` | implemented |
+| `settings:anthropicKeyStatus` | renderer → main | `{ configured: boolean }` — never returns key value | implemented |
+| `profiles:activeDbPath` | renderer → main | `getActiveProfileDbPath()` — absolute path to active `jobscout.db` | implemented |
 | `resume:upload` | renderer → main | `uploadResume()` — native file dialog, main-process read, pdf-parse/mammoth extract, DB upsert | implemented |
 
 `db:query` payload: `{ sql: string, params: unknown[] }`. Returns rows for
@@ -107,8 +110,23 @@ skip matching.
 | `ollama.base_url` | `http://localhost:11434` |
 | `ollama.model` | `llama3.2` |
 
-Anthropic uses `ANTHROPIC_API_KEY` from `.env` (loaded via `dotenv` at main
-entry). Model fixed to `claude-3-5-haiku-20241022` until settings UI exists.
+Anthropic uses `ANTHROPIC_API_KEY` from environment variables. Main entry loads
+project-root `.env` via `dotenv/config`, then `{userData}/.env` via
+`loadUserEnv()` (`override: false` so an explicit project-root value wins in
+dev). The Settings screen writes the key to `{userData}/.env` through
+`settings:saveAnthropicKey`. Model fixed to `claude-3-5-haiku-20241022`.
+
+`scout.default_date_range` (`"24h"` | `"7d"` | `"30d"` | `"60d"` | `"90d"`,
+default `"30d"`) is persisted from Settings and read by Scout on mount.
+
+`ollama:list` payload: `{ baseUrl: string }`. Returns `{ models: string[] }` or
+`{ error: string }`.
+
+`settings:saveAnthropicKey` payload: `{ apiKey: string }`. Returns `{ ok: true }`
+or `{ error: string }`.
+
+`fs:openPath` payload: absolute path or URL string. Returns `{ ok: true }` or
+`{ error: string }`.
 
 `scraper:provideSelector` payload: `{ boardId, selector }` or
 `{ boardId, cancelled: true }`. Resolves the internal pause from

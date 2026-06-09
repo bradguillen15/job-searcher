@@ -1,19 +1,20 @@
 # Current session
 
-- **Feature in progress:** pipeline-screen
-- **Started:** 2026-06-08
-- **Agent:** implementer
+> This file is cleared when each session closes and moved to `history.md`.
+> While working, **keep it updated in real time**, not at the end.
+
+- **Feature in progress:** _none_
+- **Started:** _—_
+- **Agent:** _—_
 
 ## Plan
 
-Tasks T1–T13 from `specs/pipeline-screen/tasks.md`.
+_—_
 
 ## Log
 
-- T1–T13 complete: Pipeline kanban UI, db helpers, grouping, tests.
-- `./init.sh` green; traceability in `progress/impl_pipeline-screen.md`.
-- Feature status: `in_progress` (not marked `done`).
+_—_
 
 ## Next step
 
-Launch reviewer for pipeline-screen.
+_—_

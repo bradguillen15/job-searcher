@@ -4,6 +4,9 @@ import path from "path";
 import { registerIpcHandlers } from "./ipc-handler";
 import { loadActiveProfile } from "./profiles";
 import { setMainWindow } from "./main-window";
+import { loadUserEnv } from "./settings-env";
+
+loadUserEnv();
 
 export { getMainWindow } from "./main-window";
 

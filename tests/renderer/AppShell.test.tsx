@@ -47,10 +47,22 @@ beforeEach(() => {
       if (payload?.sql?.includes("FROM settings")) {
         return Promise.resolve([]);
       }
+      if (payload?.sql?.includes("settings WHERE key")) {
+        return Promise.resolve([]);
+      }
       if (payload?.sql?.includes("FROM runs")) {
         return Promise.resolve([]);
       }
       return Promise.resolve([]);
+    }
+    if (channel === "settings:anthropicKeyStatus") {
+      return Promise.resolve({ configured: false });
+    }
+    if (channel === "profiles:activeDbPath") {
+      return Promise.resolve("/tmp/jobscout.db");
+    }
+    if (channel === "ollama:list") {
+      return Promise.resolve({ models: ["llama3.2"] });
     }
     return Promise.reject(new Error("unexpected invoke"));
   });
@@ -182,7 +194,9 @@ describe("AppShell", () => {
       {
         link: "Settings",
         matcher: async () => {
-          expect(await screen.findByText("Settings screen")).toBeTruthy();
+          expect(
+            await screen.findByRole("heading", { name: "Settings" })
+          ).toBeTruthy();
         },
       },
     ];

@@ -90,7 +90,7 @@
       "name": "settings-screen",
       "description": "AI backend selector, Ollama URL + model dropdown (from ollama list), Anthropic API key (writes .env), theme toggle, default date range, DB path",
       "sdd": true,
-      "status": "pending",
+      "status": "done",
       "priority": 12
     }
   ]

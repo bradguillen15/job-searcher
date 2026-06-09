@@ -58,6 +58,11 @@ function ensureProfileDirectory(profileId: string): string {
   return getProfileDbPath(profileId);
 }
 
+export function getActiveProfileDbPath(): string {
+  const index = readIndex();
+  return getProfileDbPath(index.activeProfileId);
+}
+
 export function listProfiles(): Profile[] {
   return readIndex().profiles;
 }

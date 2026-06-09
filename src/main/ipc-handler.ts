@@ -1,12 +1,18 @@
 import { ipcMain, shell } from "electron";
 import type Database from "better-sqlite3";
 import { db } from "./db";
+import { listOllamaModels } from "./ollama";
 import {
   createProfile,
   deleteProfile,
+  getActiveProfileDbPath,
   listProfiles,
   switchProfile,
 } from "./profiles";
+import {
+  isAnthropicKeyConfigured,
+  saveAnthropicApiKey,
+} from "./settings-env";
 import { uploadResume } from "./resume";
 import { getMainWindow } from "./main-window";
 import { createProgressEmitter } from "./scraper/progress";
@@ -31,6 +37,9 @@ const ALLOWED_CHANNELS = [
   "scraper:provideSelector",
   "ollama:list",
   "fs:openPath",
+  "settings:saveAnthropicKey",
+  "settings:anthropicKeyStatus",
+  "profiles:activeDbPath",
   "profiles:list",
   "profiles:create",
   "profiles:switch",
@@ -139,21 +148,22 @@ export function registerIpcHandlers(): void {
     openPathOrUrl(pathOrUrl)
   );
 
-  for (const channel of ALLOWED_CHANNELS) {
-    if (
-      channel === "db:query" ||
-      channel.startsWith("profiles:") ||
-      channel === "resume:upload" ||
-      channel === "scraper:run" ||
-      channel === "scraper:provideSelector" ||
-      channel === "fs:openPath"
-    ) {
-      continue;
-    }
-    ipcMain.handle(channel, async (_event, ...args: unknown[]) => {
-      return { channel, args, stub: true };
-    });
-  }
+  ipcMain.handle(
+    "ollama:list",
+    async (_event, payload: { baseUrl: string }) =>
+      listOllamaModels(payload.baseUrl)
+  );
+
+  ipcMain.handle(
+    "settings:saveAnthropicKey",
+    (_event, payload: { apiKey: string }) => saveAnthropicApiKey(payload.apiKey)
+  );
+
+  ipcMain.handle("settings:anthropicKeyStatus", () => ({
+    configured: isAnthropicKeyConfigured(),
+  }));
+
+  ipcMain.handle("profiles:activeDbPath", () => getActiveProfileDbPath());
 }
 
 export function validateChannel(channel: string): AllowedChannel {

@@ -8,6 +8,7 @@ import {
   ProfileError,
   createProfile,
   deleteProfile,
+  getActiveProfileDbPath,
   listProfiles,
   loadActiveProfile,
   switchProfile,
@@ -89,6 +90,25 @@ describe("profiles", () => {
         return true;
       }
     );
+  });
+
+  it("getActiveProfileDbPath returns absolute path to active profile jobscout.db", () => {
+    loadActiveProfile();
+
+    const index = JSON.parse(
+      fs.readFileSync(path.join(tempUserData, "profiles.json"), "utf-8")
+    ) as { activeProfileId: string };
+
+    const dbPath = getActiveProfileDbPath();
+    const expected = path.join(
+      tempUserData,
+      "profiles",
+      index.activeProfileId,
+      "jobscout.db"
+    );
+
+    assert.equal(dbPath, expected);
+    assert.ok(path.isAbsolute(dbPath));
   });
 
   it("keeps each profile database isolated", () => {
