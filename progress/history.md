@@ -27,3 +27,11 @@
 - **Changes:** better-sqlite3 + types installed; 001_initial.sql (8 tables: schema_migrations + 7 BRD tables); db.ts (MigrationError, openDatabase, PRAGMA foreign_keys, transaction-wrapped migrations); profiles.ts (Profile, ProfileError, listProfiles/createProfile/switchProfile/deleteProfile/loadActiveProfile, profiles.json index, per-profile DB isolation); ipc-handler.ts wired db:query + profiles:* channels; preload.ts updated; docs/architecture.md and docs/conventions.md updated with module map, data flow, profile isolation, DB conventions.
 - **Tests:** tests/db.test.ts, tests/profiles.test.ts, extended ipc-handler tests.
 - **Result:** All 13 tasks [x]. Reviewer approved. Status → done.
+
+---
+
+## 2026-06-08 — navigation-layout (done)
+- **Agent:** leader → implementer → reviewer (2 rounds)
+- **Changes:** Tailwind CSS + shadcn/ui init; globals.css with shadcn CSS vars; useTheme hook (dark/light on html); createHashRouter with AppShell/Sidebar/NavItem/ProfileSwitcher; 6 placeholder screens; drag region for Electron; profile switcher via profiles IPC.
+- **Tests:** useTheme, NavItem, ProfileSwitcher, AppShell, router, Sidebar, globals + extended coverage for R1–R18.
+- **Result:** All 14 tasks [x]. Reviewer approved. Committed and pushed to GitHub.

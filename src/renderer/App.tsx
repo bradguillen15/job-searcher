@@ -1,14 +1,9 @@
 import React from "react";
-import { useTranslation } from "react-i18next";
+import { RouterProvider } from "react-router-dom";
+import { router } from "./router";
 
 function App(): React.JSX.Element {
-  const { t } = useTranslation();
-
-  return (
-    <div className="app">
-      <h1>{t("app.title")}</h1>
-    </div>
-  );
+  return <RouterProvider router={router} />;
 }
 
 export default App;

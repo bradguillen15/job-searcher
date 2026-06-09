@@ -48,7 +48,7 @@
       "name": "navigation-layout",
       "description": "Slack-style sidebar (Scout · Results · Pipeline · Boards & Keywords · Resume · Settings), dark/light theme toggle, Inter + JetBrains Mono fonts",
       "sdd": true,
-      "status": "spec_ready",
+      "status": "done",
       "priority": 6
     },
     {

@@ -26,17 +26,17 @@ CUANDO el usuario hace clic en un ítem de la barra lateral, el sistema DEBE
 navegar a la ruta correspondiente sin recargar la página.
 
 ## R7
-El sistema DEBE aplicar la clase `theme-dark` al elemento `<html>` como valor
+El sistema DEBE aplicar la clase `dark` al elemento `<html>` como valor
 predeterminado al arrancar, a menos que `localStorage` contenga `theme: "light"`.
 
 ## R8
 CUANDO el usuario hace clic en el botón de alternancia de tema, el sistema DEBE
-conmutar la clase del elemento `<html>` entre `theme-dark` y `theme-light` y
+conmutar la clase del elemento `<html>` entre `dark` y `light` y
 persistir la nueva preferencia en `localStorage` bajo la clave `theme`.
 
 ## R9
 CUANDO la aplicación carga, el sistema DEBE leer `localStorage["theme"]` y aplicar
-la clase correspondiente (`theme-dark` o `theme-light`) al elemento `<html>` antes
+la clase correspondiente (`dark` o `light`) al elemento `<html>` antes
 de que el primer frame sea visible.
 
 ## R10
